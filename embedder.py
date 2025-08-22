@@ -1,14 +1,9 @@
 from dotenv import load_dotenv
 import psycopg
-from psycopg_pool import ConnectionPool
-from pgvector.psycopg import register_vector
 
-from numpy.typing import NDArray
 from typing import TypeVar
 import cocoindex
 import os
-import numpy as np
-from sentence_transformers import SentenceTransformer
 
 CT = TypeVar('CT', bound=psycopg.Connection)
 
@@ -21,7 +16,6 @@ def extract_extension(filename: str) -> str:
 
 @cocoindex.flow_def(name="CodeEmbedding")
 def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoindex.DataScope):
-    print("Building flow...")
     data_scope["documents"] = flow_builder.add_source(
         cocoindex.sources.LocalFile(
             path="/Users/f1253/dev/projects/js-monorepo",
@@ -33,7 +27,6 @@ def text_embedding_flow(flow_builder: cocoindex.FlowBuilder, data_scope: cocoind
     code_embeddings = data_scope.add_collector()
 
     with data_scope["documents"].row() as file:
-        print(f"Processing file: {file['filename']}")
         file["extension"] = file["filename"].transform(extract_extension)  # type: ignore
         file["chunks"] = file["content"].transform(
             cocoindex.functions.SplitRecursively(),
