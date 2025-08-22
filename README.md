@@ -8,7 +8,7 @@ This project allows you to vectorize your codebase and store it in a local datab
 
 We are using pyenv and python 3.13.0, along with pip. I did also try this with `uv` and it worked fine as well
 
-```python
+```sh
 brew install pyenv
 pyenv install 3.13.0
 pyenv global 3.13.0
@@ -22,15 +22,15 @@ uv sync
 
 Start the database
 
-```
+```sh
 docker compose up -d
 ```
 
 ### Update repo path
 
-In main.py change the path to the repo you want to embed
+In `embedder.py` change the path to the repo you want to embed
 
-```
+```python
 cocoindex.sources.LocalFile(
     path="/Users/f1253/dev/projects/js-monorepo", # <-- change this to whatever you want
     included_patterns=["**/*.js", "**/*.ts", "**/*.jsx", "**/*.tsx", "**/*.md", "**/*.mdx", "**/*.json"],
@@ -42,10 +42,10 @@ and now we can generate the embeddings via
 
 ```python
 # pip
-cocoindex update --setup main.py
+cocoindex update --setup `embedder.py`
 
 #uv
-uv run --with cocoindex cocoindex update --setup main.py
+uv run --with cocoindex cocoindex update --setup `embedder.py`
 ```
 
 Your database should be populated by the embedding once the process completes.
@@ -64,14 +64,14 @@ pip install huggingface_hub
 huggingface-cli repo download sentence-transformers/all-MiniLM-L6-v2
 ```
 
-And update the model path in `main.py`:
+And update the model path in `embedder.py`:
 
 ```python
 # Change this
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+model = cocoindex.functions.SentenceTransformerEmbed(model="sentence-transformers/all-MiniLM-L6-v2")
 
 # To this (might have to use absolute path i havent tried with relative path)
-model = SentenceTransformer("~/models/sentence-transformers/all-MiniLM-L6-v2")
+model = cocoindex.functions.SentenceTransformerEmbed(model="~/models/sentence-transformers/all-MiniLM-L6-v2")
 ```
 
 NOTE: i havent tried other models but you if you want to try them this is where you would change that out.
